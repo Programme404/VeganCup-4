@@ -346,6 +346,49 @@
       box-shadow: 0 0 0 3px rgba(45, 139, 143, .10);
     }
 
+    .check-pill.easter-egg input:checked + span {
+      border-color: rgba(188, 142, 195, .55);
+      background:
+        linear-gradient(105deg,
+          rgba(255, 153, 153, .28),
+          rgba(255, 214, 128, .26),
+          rgba(246, 244, 155, .24),
+          rgba(150, 219, 170, .25),
+          rgba(137, 204, 224, .26),
+          rgba(166, 157, 221, .25),
+          rgba(219, 153, 204, .27));
+      box-shadow: 0 0 0 3px rgba(184, 139, 195, .13);
+      animation: egg-pop-shake .42s ease-out;
+    }
+
+    .check-pill.easter-egg input:checked + span small {
+      color: #8e5f9e;
+    }
+
+    @keyframes egg-pop-shake {
+      0% {
+        transform: rotate(0deg) scale(1);
+      }
+      18% {
+        transform: rotate(-1.8deg) scale(1.055);
+      }
+      34% {
+        transform: rotate(1.8deg) scale(1.07);
+      }
+      50% {
+        transform: rotate(-1.2deg) scale(1.055);
+      }
+      66% {
+        transform: rotate(1.2deg) scale(1.035);
+      }
+      82% {
+        transform: rotate(-.6deg) scale(1.015);
+      }
+      100% {
+        transform: rotate(0deg) scale(1);
+      }
+    }
+
     .check-pill input:disabled + span {
       opacity: .45;
       cursor: not-allowed;
@@ -938,6 +981,10 @@
                 <input type="checkbox" data-score="20" data-label="不抓取维什戴尔">
                 <span>不抓取维什戴尔 <small>+20</small></span>
               </label>
+              <label class="check-pill easter-egg">
+                <input type="checkbox" data-score="7.99" data-label="抓取呼呼呼！">
+                <span>抓取呼呼呼！ <small>+7.99</small></span>
+              </label>
             </div>
           </div>
         </section>
@@ -993,7 +1040,7 @@
       details: []
     };
 
-    const formatScore = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1);
+    const formatScore = (value) => Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
 
     const num = (id) => {
       const value = Number(document.getElementById(id).value);
