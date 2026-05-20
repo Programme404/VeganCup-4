@@ -203,7 +203,8 @@
     }
 
     section,
-    .summary {
+    .summary,
+    .timer-panel {
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: rgba(255, 253, 248, .9);
@@ -453,9 +454,14 @@
       font-size: 13px;
     }
 
-    .summary {
+    .side-stack {
       position: sticky;
       top: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .summary {
       overflow: hidden;
     }
 
@@ -550,6 +556,124 @@
       font-size: 13px;
     }
 
+    .timer-panel {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 14px 16px 16px;
+      background: rgba(255, 253, 248, .9);
+    }
+
+    .timer-title {
+      justify-self: stretch;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .timer-display {
+      font-variant-numeric: tabular-nums;
+      color: #3b474f;
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .timer-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .timer-btn {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(54, 46, 40, .14);
+      transition: transform .16s ease, background .16s ease, box-shadow .16s ease;
+    }
+
+    .timer-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(54, 46, 40, .18);
+    }
+
+    .timer-toggle {
+      background: #63ad72;
+    }
+
+    .timer-toggle.is-running {
+      background: #d36d6d;
+    }
+
+    .timer-toggle::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 10px solid rgba(255, 255, 255, .92);
+      transform: translate(-38%, -50%);
+    }
+
+    .timer-toggle.is-running::before,
+    .timer-toggle.is-running::after {
+      content: "";
+      position: absolute;
+      top: 9px;
+      width: 4px;
+      height: 14px;
+      border: 0;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, .92);
+      transform: none;
+    }
+
+    .timer-toggle.is-running::before {
+      left: 11px;
+    }
+
+    .timer-toggle.is-running::after {
+      left: 17px;
+    }
+
+    .timer-reset {
+      background: #a8adb0;
+    }
+
+    .timer-reset::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      width: 13px;
+      height: 13px;
+      border: 3px solid rgba(255, 255, 255, .92);
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-35deg);
+    }
+
+    .timer-reset::after {
+      content: "";
+      position: absolute;
+      top: 7px;
+      left: 18px;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 6px solid rgba(255, 255, 255, .92);
+      transform: rotate(12deg);
+    }
+
     .toast {
       position: fixed;
       right: 18px;
@@ -590,7 +714,7 @@
         grid-template-columns: 1fr;
       }
 
-      .summary {
+      .side-stack {
         position: static;
       }
     }
@@ -644,7 +768,7 @@
 
   <main>
     <div class="toolbar">
-      <p class="formula">约定：禁止电表倒转，三层前有一次重开机会</p>
+      <p class="formula">约定：禁止电表倒转；三层前有一次重开机会；取钱不得超过50</p>
       <div class="actions">
         <button class="btn primary" id="calcBtn" type="button">计算分数</button>
         <button class="btn" id="copyBtn" type="button">复制明细</button>
@@ -703,6 +827,10 @@
               <label class="field">
                 <span>临时招募六星 · 每个 +15</span>
                 <input id="temp6" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>取钱超支 · 每超一块 -50</span>
+                <input id="moneyOverrun" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
               </label>
             </div>
 
@@ -990,41 +1118,52 @@
         </section>
       </div>
 
-      <aside class="summary" aria-live="polite">
-        <div class="summary-main">
-          <span>总分</span>
-          <strong id="totalScore">0</strong>
-        </div>
-        <div class="breakdown">
-          <div class="score-box">
-            <span>结算分</span>
-            <strong id="settlementScore">0</strong>
+      <div class="side-stack">
+        <aside class="summary" aria-live="polite">
+          <div class="summary-main">
+            <span>总分</span>
+            <strong id="totalScore">0</strong>
           </div>
-          <div class="score-box">
-            <span>后勤分</span>
-            <strong id="logisticsScore">0</strong>
+          <div class="breakdown">
+            <div class="score-box">
+              <span>结算分</span>
+              <strong id="settlementScore">0</strong>
+            </div>
+            <div class="score-box">
+              <span>后勤分</span>
+              <strong id="logisticsScore">0</strong>
+            </div>
+            <div class="score-box">
+              <span>作战分</span>
+              <strong id="combatScore">0</strong>
+            </div>
+            <div class="score-box">
+              <span>限制分</span>
+              <strong id="limitScore">0</strong>
+            </div>
           </div>
-          <div class="score-box">
-            <span>作战分</span>
-            <strong id="combatScore">0</strong>
+          <div class="detail">
+            <h3>计分明细</h3>
+            <ul class="detail-list" id="detailList"></ul>
+            <p class="empty" id="emptyDetail">点击计算后显示已计入项目。</p>
           </div>
-          <div class="score-box">
-            <span>限制分</span>
-            <strong id="limitScore">0</strong>
+        </aside>
+
+        <section class="timer-panel" aria-label="计时器">
+          <div class="timer-title">计时器</div>
+          <div class="timer-display" id="timerDisplay">0:00</div>
+          <div class="timer-controls">
+            <button class="timer-btn timer-toggle" id="timerToggle" type="button" aria-label="开始或暂停计时"></button>
+            <button class="timer-btn timer-reset" id="timerReset" type="button" aria-label="复位计时"></button>
           </div>
-        </div>
-        <div class="detail">
-          <h3>计分明细</h3>
-          <ul class="detail-list" id="detailList"></ul>
-          <p class="empty" id="emptyDetail">点击计算后显示已计入项目。</p>
-        </div>
-      </aside>
+        </section>
+      </div>
     </div>
   </main>
 
   <footer class="app-footer">
-    <span>版本号：v2.2</span>
-    <span>修改日期：2026.5.20</span>
+    <span>版本号：v3</span>
+    <span>修改日期：2026.5.21</span>
     <span>作者：GPT-5.5 &amp; 阿能才不是受</span>
   </footer>
 
@@ -1041,6 +1180,7 @@
     };
 
     const formatScore = (value) => Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, "");
+    const formatDelta = (value) => `${value > 0 ? "+" : ""}${formatScore(value)}`;
 
     const num = (id) => {
       const value = Number(document.getElementById(id).value);
@@ -1073,6 +1213,58 @@
         const groupCompare = groupOrder[a.group] - groupOrder[b.group];
         return groupCompare || a.index - b.index;
       });
+
+    let timerElapsedMs = 0;
+    let timerStartedAt = 0;
+    let timerInterval = null;
+
+    function formatTimer(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function renderTimer() {
+      document.getElementById("timerDisplay").textContent = formatTimer(timerElapsedMs);
+    }
+
+    function startTimer() {
+      timerStartedAt = Date.now() - timerElapsedMs;
+      timerInterval = window.setInterval(() => {
+        timerElapsedMs = Date.now() - timerStartedAt;
+        renderTimer();
+      }, 250);
+      document.getElementById("timerToggle").classList.add("is-running");
+    }
+
+    function pauseTimer() {
+      if (!timerInterval) return;
+      window.clearInterval(timerInterval);
+      timerInterval = null;
+      timerElapsedMs = Date.now() - timerStartedAt;
+      renderTimer();
+      document.getElementById("timerToggle").classList.remove("is-running");
+    }
+
+    function toggleTimer() {
+      if (timerInterval) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+
+    function resetTimer() {
+      if (timerInterval) {
+        window.clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerElapsedMs = 0;
+      timerStartedAt = 0;
+      document.getElementById("timerToggle").classList.remove("is-running");
+      renderTimer();
+    }
 
     function selectedRadioScore(name) {
       const input = document.querySelector(`input[name="${name}"]:checked`);
@@ -1110,7 +1302,8 @@
         ["collectibleCount", 3, "藏品数量"],
         ["temp4", 5, "临时招募四星干员"],
         ["temp5", 10, "临时招募五星干员"],
-        ["temp6", 15, "临时招募六星干员"]
+        ["temp6", 15, "临时招募六星干员"],
+        ["moneyOverrun", -50, "取钱超支"]
       ];
       logisticsCounts.forEach(([id, unit, label]) => {
         const count = num(id);
@@ -1184,7 +1377,7 @@
         const span = document.createElement("span");
         const score = document.createElement("b");
         span.textContent = `${groupName[item.group]} · ${item.label}`;
-        score.textContent = `+${formatScore(item.score)}`;
+        score.textContent = formatDelta(item.score);
         li.append(span, score);
         list.append(li);
       });
@@ -1215,7 +1408,7 @@
       if (scoreState.details.length) {
         lines.push("", "计分明细：");
         sortedDetails(scoreState.details).forEach((item) => {
-          lines.push(`- ${groupName[item.group]} · ${item.label}：+${formatScore(item.score)}`);
+          lines.push(`- ${groupName[item.group]} · ${item.label}：${formatDelta(item.score)}`);
         });
       }
       try {
@@ -1237,6 +1430,8 @@
     document.getElementById("calcBtn").addEventListener("click", calculate);
     document.getElementById("copyBtn").addEventListener("click", copyDetails);
     document.getElementById("resetBtn").addEventListener("click", resetAll);
+    document.getElementById("timerToggle").addEventListener("click", toggleTimer);
+    document.getElementById("timerReset").addEventListener("click", resetTimer);
     document.getElementById("seventhBoss").addEventListener("change", updateSevenState);
     document.addEventListener("input", (event) => {
       if (event.target.matches("input, select")) {
@@ -1245,6 +1440,7 @@
     });
 
     updateSevenState();
+    renderTimer();
     render(scoreState);
   </script>
 </body>
