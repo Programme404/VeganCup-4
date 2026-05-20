@@ -1,0 +1,1204 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>掀树杯#4 算分器</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f4ee;
+      --paper: #fffdf8;
+      --paper-2: #fbf7ef;
+      --ink: #27343a;
+      --muted: #738089;
+      --line: #ddd4c8;
+      --teal: #2d8b8f;
+      --teal-2: #d8eeec;
+      --rose: #d86f96;
+      --rose-2: #f7dfe8;
+      --amber: #c98a45;
+      --amber-2: #f6ead9;
+      --shadow: 0 18px 50px rgba(67, 55, 45, .12);
+      --radius: 8px;
+      font-family: "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(247, 244, 238, .96) 320px),
+        var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app-header {
+      position: relative;
+      min-height: 178px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(221, 212, 200, .65);
+      background: #ede5da;
+    }
+
+    .app-header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(35, 42, 48, .58), rgba(35, 42, 48, .08) 48%, rgba(255, 253, 248, .72)),
+        url("https://media.prts.wiki/d/d8/%E4%B8%BB%E9%A2%98%E5%9B%BE_%E5%B2%81%E7%9A%84%E7%95%8C%E5%9B%AD%E5%BF%97%E5%BC%82.png?v=6psw153efw609100xqsa9nd92uho76w") center / cover no-repeat;
+      filter: saturate(.9) brightness(1.08);
+      transform: scale(1.01);
+    }
+
+    .header-inner {
+      position: relative;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 30px 22px 34px;
+      min-height: 178px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .title-block {
+      color: #fffdf8;
+      text-shadow: 0 2px 18px rgba(24, 25, 27, .36);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      padding: 5px 10px;
+      border: 1px solid rgba(255, 255, 255, .58);
+      border-radius: 999px;
+      background: rgba(255, 253, 248, .14);
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4.8vw, 56px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      font-weight: 800;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: rgba(255, 253, 248, .9);
+      font-size: 17px;
+    }
+
+    .header-score {
+      min-width: 190px;
+      padding: 14px 18px;
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, .74);
+      color: var(--ink);
+      box-shadow: 0 10px 26px rgba(37, 33, 31, .18);
+      backdrop-filter: blur(8px);
+    }
+
+    .header-score span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .header-score strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--teal);
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    main {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .formula {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 40px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .8) inset;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #c8bbaa;
+      background: #fffaf0;
+    }
+
+    .btn.primary {
+      border-color: #2f7f83;
+      background: var(--teal);
+      color: white;
+      box-shadow: 0 8px 18px rgba(45, 139, 143, .22);
+    }
+
+    .btn.primary:hover {
+      background: #277a7e;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sections {
+      display: grid;
+      gap: 14px;
+    }
+
+    section,
+    .summary {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 253, 248, .9);
+      box-shadow: var(--shadow);
+    }
+
+    section {
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 15px 16px 12px;
+      border-bottom: 1px solid #eee5da;
+      background: linear-gradient(180deg, rgba(251, 247, 239, .95), rgba(255, 253, 248, .95));
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .section-head span {
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .section-body {
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    label.field > span,
+    .field-title {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    input[type="number"],
+    select {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fffefa;
+      color: var(--ink);
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(45, 139, 143, .15);
+    }
+
+    .group-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 0 -4px;
+      color: #49565e;
+      font-weight: 700;
+    }
+
+    .group-title::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: #ece2d6;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .check-pill,
+    .segment label {
+      position: relative;
+      min-width: 0;
+    }
+
+    .check-pill input,
+    .segment input {
+      position: absolute;
+      inline-size: 1px;
+      block-size: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .check-pill span {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fffefa;
+      color: #354148;
+      transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .check-pill small {
+      flex: 0 0 auto;
+      color: var(--teal);
+      font-weight: 700;
+    }
+
+    .check-pill input:checked + span {
+      border-color: #87c2c2;
+      background: var(--teal-2);
+      box-shadow: 0 0 0 3px rgba(45, 139, 143, .10);
+    }
+
+    .check-pill input:disabled + span {
+      opacity: .45;
+      cursor: not-allowed;
+      background: #f3efe8;
+    }
+
+    .segment-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .segment-card {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .segment-name {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .segment {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: #fffefa;
+    }
+
+    .segment.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .segment span {
+      display: grid;
+      place-items: center;
+      min-height: 38px;
+      padding: 6px 4px;
+      border-right: 1px solid var(--line);
+      color: #53606a;
+      font-size: 13px;
+      text-align: center;
+      transition: background .16s ease, color .16s ease;
+    }
+
+    .segment label:last-child span {
+      border-right: 0;
+    }
+
+    .segment input:checked + span {
+      background: var(--rose-2);
+      color: #9f3d62;
+      font-weight: 700;
+    }
+
+    .note {
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary {
+      position: sticky;
+      top: 18px;
+      overflow: hidden;
+    }
+
+    .summary-main {
+      padding: 18px;
+      background: linear-gradient(180deg, #fffdf8, #fbf6ee);
+      border-bottom: 1px solid #eee5da;
+    }
+
+    .summary-main span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-main strong {
+      display: block;
+      margin-top: 4px;
+      color: var(--teal);
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .breakdown {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+      border-bottom: 1px solid #eee5da;
+    }
+
+    .score-box {
+      padding: 10px;
+      border: 1px solid #ece2d6;
+      border-radius: var(--radius);
+      background: #fffefa;
+    }
+
+    .score-box span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .score-box strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 22px;
+      color: #3b474f;
+    }
+
+    .detail {
+      max-height: 430px;
+      overflow: auto;
+      padding: 14px 16px 16px;
+    }
+
+    .detail h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .detail-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px dashed #eadfce;
+      color: #4c5961;
+      font-size: 13px;
+    }
+
+    .detail-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .detail-list b {
+      flex: 0 0 auto;
+      color: var(--amber);
+    }
+
+    .empty {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 10px 13px;
+      border: 1px solid #cde0dc;
+      border-radius: var(--radius);
+      background: #f6fffb;
+      color: #2e6668;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .app-footer {
+      max-width: 1220px;
+      margin: 4px auto 26px;
+      padding: 0 22px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .app-footer span {
+      display: inline-block;
+      margin: 4px 10px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .header-inner {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .header-score {
+        width: 100%;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .btn {
+        flex: 1 1 0;
+      }
+
+      .grid,
+      .grid.two,
+      .check-grid,
+      .segment-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="title-block">
+        <p class="eyebrow">集成战略 · 岁的界园志异</p>
+        <h1>掀树杯#4 算分器</h1>
+        <p class="subtitle">咕咕嘎嘎</p>
+      </div>
+      <div class="header-score">
+        <span>当前总分</span>
+        <strong id="heroTotal">0</strong>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <p class="formula">约定：禁止电表倒转，三层前有一次重开机会</p>
+      <div class="actions">
+        <button class="btn primary" id="calcBtn" type="button">计算分数</button>
+        <button class="btn" id="copyBtn" type="button">复制明细</button>
+        <button class="btn" id="resetBtn" type="button">清空</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="sections">
+        <section>
+          <div class="section-head">
+            <h2>结算分</h2>
+            <span>原始结算分 × 难度倍率</span>
+          </div>
+          <div class="section-body">
+            <div class="grid two">
+              <label class="field">
+                <span>基础难度</span>
+                <select id="difficulty">
+                  <option value="0.8">N12 · ×0.8</option>
+                  <option value="0.9">N13 · ×0.9</option>
+                  <option value="1">N14 · ×1.0</option>
+                  <option value="1.1">N15 · ×1.1</option>
+                  <option value="1.2">N16 · ×1.2</option>
+                  <option value="1.3">N17 · ×1.3</option>
+                  <option value="1.5">N18 · ×1.5</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>游戏原始结算分</span>
+                <input id="settlementRaw" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <h2>后勤分</h2>
+            <span>藏品与临时招募</span>
+          </div>
+          <div class="section-body">
+            <div class="grid">
+              <label class="field">
+                <span>藏品数量 · 每个 +3</span>
+                <input id="collectibleCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>临时招募四星 · 每个 +5</span>
+                <input id="temp4" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>临时招募五星 · 每个 +10</span>
+                <input id="temp5" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>临时招募六星 · 每个 +15</span>
+                <input id="temp6" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+            </div>
+
+            <div class="group-title">收藏品</div>
+            <div class="check-grid">
+              <label class="check-pill">
+                <input id="mohua" type="checkbox" data-score="50" data-label="持有收藏品“墨化残碑”">
+                <span>墨化残碑 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="bushe" type="checkbox">
+                <span>不赦 <small id="busheScore">+60</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="buxi" type="checkbox">
+                <span>不息 <small id="buxiScore">+60</small></span>
+              </label>
+            </div>
+
+            <div class="group-title">七层险路恶敌</div>
+            <div class="check-grid">
+              <label class="check-pill">
+                <input id="seventhBoss" type="checkbox">
+                <span>通关七层险路恶敌 <small>启用</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="wufeng" type="checkbox" data-seven-score="50" data-label="七层险路恶敌：无封长盒">
+                <span>无封长盒 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="wangsheng" type="checkbox" data-seven-score="100" data-label="七层险路恶敌：忘生珍珑">
+                <span>忘生珍珑 <small>+100</small></span>
+              </label>
+            </div>
+            <p class="note">七层险路恶敌开启后，“不赦”“不息”按每个 +80 计算。</p>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <h2>作战分</h2>
+            <span>结局、紧急作战与击杀</span>
+          </div>
+          <div class="section-body">
+            <div class="group-title">结局与关键作战</div>
+            <div class="segment-list">
+              <div class="segment-card">
+                <div class="segment-name">昔字如烟</div>
+                <div class="segment">
+                  <label><input type="radio" name="boss_xizi" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="boss_xizi" value="120" data-score-label="通关“昔字如烟”"><span>通关 +120</span></label>
+                  <label><input type="radio" name="boss_xizi" value="150" data-score-label="无漏通关“昔字如烟”"><span>无漏 +150</span></label>
+                </div>
+              </div>
+              <div class="segment-card">
+                <div class="segment-name">往昔难忆</div>
+                <div class="segment">
+                  <label><input type="radio" name="boss_wangxi" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="boss_wangxi" value="150" data-score-label="通关“往昔难忆”"><span>通关 +150</span></label>
+                  <label><input type="radio" name="boss_wangxi" value="200" data-score-label="无漏通关“往昔难忆”"><span>无漏 +200</span></label>
+                </div>
+              </div>
+              <div class="segment-card">
+                <div class="segment-name">谋岁者</div>
+                <div class="segment">
+                  <label><input type="radio" name="boss_mousui" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="boss_mousui" value="200" data-score-label="通关“谋岁者”"><span>通关 +200</span></label>
+                  <label><input type="radio" name="boss_mousui" value="250" data-score-label="无漏通关“谋岁者”"><span>无漏 +250</span></label>
+                </div>
+              </div>
+              <div class="segment-card">
+                <div class="segment-name">末狩</div>
+                <div class="segment">
+                  <label><input type="radio" name="boss_moshou" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="boss_moshou" value="250" data-score-label="通关“末狩”"><span>通关 +250</span></label>
+                  <label><input type="radio" name="boss_moshou" value="300" data-score-label="无漏通关“末狩”"><span>无漏 +300</span></label>
+                </div>
+              </div>
+              <label class="field">
+                <span>止变</span>
+                <select id="zhibian">
+                  <option value="0" data-score-label="">无</option>
+                  <option value="800" data-score-label="通关“止变”(役群兽)：未损失目标生命值">役群兽 · 未损失目标生命值 +800</option>
+                  <option value="750" data-score-label="通关“止变”(役群兽)：损失目标生命值小于5">役群兽 · 损失目标生命值小于5 +750</option>
+                  <option value="700" data-score-label="通关“止变”(役群兽)：损失目标生命值大于等于5且小于50">役群兽 · 损失目标生命值 ≥5 且 &lt;50 +700</option>
+                  <option value="500" data-score-label="通关“止变”(役群兽)：损失目标生命值大于等于50">役群兽 · 损失目标生命值 ≥50 +500</option>
+                  <option value="400" data-score-label="通关“止变”(其他难度)">其他难度 +400</option>
+                </select>
+              </label>
+              <div class="segment-card">
+                <div class="segment-name" aria-hidden="true">&nbsp;</div>
+                <label class="check-pill">
+                  <input type="checkbox" data-score="300" data-label="通关“定乾坤”">
+                  <span>定乾坤 <small>+300</small></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="group-title">普通与紧急作战</div>
+            <div class="check-grid">
+              <label class="check-pill">
+                <input type="checkbox" data-score="10" data-label="通关“夕娥忆”">
+                <span>夕娥忆 <small>+10</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="30" data-label="通关“求道”">
+                <span>求道 <small>+30</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="30" data-label="通关“仁·义·武”">
+                <span>仁·义·武 <small>+30</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="20" data-label="通关紧急“背山面水”">
+                <span>紧急“背山面水” <small>+20</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="通关紧急“邙山镇地方志”">
+                <span>紧急“邙山镇地方志” <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="通关紧急“青山不语”">
+                <span>紧急“青山不语” <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="通关紧急“不成烟火”">
+                <span>紧急“不成烟火” <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="通关紧急“砺锋”">
+                <span>紧急“砺锋” <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="80" data-label="通关紧急“越山海”">
+                <span>紧急“越山海” <small>+80</small></span>
+              </label>
+            </div>
+
+            <div class="segment-list">
+              <div class="segment-card">
+                <div class="segment-name">紧急“忍气不吞声”</div>
+                <div class="segment">
+                  <label><input type="radio" name="renqi" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="renqi" value="40" data-score-label="通关紧急“忍气不吞声”"><span>通关 +40</span></label>
+                  <label><input type="radio" name="renqi" value="60" data-score-label="无漏通关紧急“忍气不吞声”"><span>无漏 +60</span></label>
+                </div>
+              </div>
+              <div class="segment-card">
+                <div class="segment-name">分明</div>
+                <div class="segment">
+                  <label><input type="radio" name="fenming" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="fenming" value="20" data-score-label="通关“分明”"><span>通关 +20</span></label>
+                  <label><input type="radio" name="fenming" value="40" data-score-label="无漏通关“分明”"><span>无漏 +40</span></label>
+                </div>
+              </div>
+              <div class="segment-card">
+                <div class="segment-name">录忆</div>
+                <div class="segment">
+                  <label><input type="radio" name="luyi" value="0" checked><span>无</span></label>
+                  <label><input type="radio" name="luyi" value="50" data-score-label="通关“录忆”"><span>通关 +50</span></label>
+                  <label><input type="radio" name="luyi" value="80" data-score-label="无漏通关“录忆”"><span>无漏 +80</span></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="group-title">无漏专项</div>
+            <div class="check-grid">
+              <label class="check-pill">
+                <input type="checkbox" data-score="30" data-label="无漏通关紧急“劫罚”">
+                <span>紧急“劫罚” <small>+30</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="40" data-label="无漏通关“生百相”">
+                <span>生百相 <small>+40</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="40" data-label="无漏通关紧急“循循善诱”">
+                <span>紧急“循循善诱” <small>+40</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="40" data-label="无漏通关普通“以逸待劳”">
+                <span>普通“以逸待劳” <small>+40</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="40" data-label="无漏通关紧急“硕果累累”">
+                <span>紧急“硕果累累” <small>+40</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="40" data-label="无漏通关紧急“彻底失控”">
+                <span>紧急“彻底失控” <small>+40</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="30" data-label="无漏通关“地有四难”">
+                <span>地有四难 <small>+30</small></span>
+              </label>
+            </div>
+
+            <div class="group-title">按次数计分</div>
+            <div class="grid">
+              <label class="field">
+                <span>其他三层紧急 · 每次 +10</span>
+                <input id="otherLayer3Low" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>其他四层紧急 · 每次 +25</span>
+                <input id="otherLayer3" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>其他五层紧急 · 每次 +35</span>
+                <input id="otherLayer5" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>其他六层紧急 · 每次 +60</span>
+                <input id="otherLayer6" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>小八界出现击杀 · 每只 +10</span>
+                <input id="xiaobajie" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">
+                <span>鸭、狗、熊、鼠出现击杀 · 每只 +5</span>
+                <input id="beasts" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <div class="section-head">
+            <h2>限制分</h2>
+            <span>限时与不抓取</span>
+          </div>
+          <div class="section-body">
+            <div class="check-grid">
+              <label class="check-pill">
+                <input type="checkbox" data-score="100" data-label="150分钟内完成六层及以上的结局结算">
+                <span>150分钟内六层及以上结算 <small>+100</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="150" data-label="200分钟内完成七层及以上的结局结算">
+                <span>200分钟内七层及以上结算 <small>+150</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="100" data-label="不抓取电弧">
+                <span>不抓取电弧 <small>+100</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="100" data-label="不抓取斩业星熊">
+                <span>不抓取斩业星熊 <small>+100</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="不抓取酒神">
+                <span>不抓取酒神 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="不抓取麒麟R夜刀">
+                <span>不抓取麒麟R夜刀 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="50" data-label="不抓取凛御银灰">
+                <span>不抓取凛御银灰 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="20" data-label="不抓取新约能天使">
+                <span>不抓取新约能天使 <small>+20</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="20" data-label="不抓取望">
+                <span>不抓取望 <small>+20</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="20" data-label="不抓取圣聆初雪">
+                <span>不抓取圣聆初雪 <small>+20</small></span>
+              </label>
+              <label class="check-pill">
+                <input type="checkbox" data-score="20" data-label="不抓取维什戴尔">
+                <span>不抓取维什戴尔 <small>+20</small></span>
+              </label>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="summary" aria-live="polite">
+        <div class="summary-main">
+          <span>总分</span>
+          <strong id="totalScore">0</strong>
+        </div>
+        <div class="breakdown">
+          <div class="score-box">
+            <span>结算分</span>
+            <strong id="settlementScore">0</strong>
+          </div>
+          <div class="score-box">
+            <span>后勤分</span>
+            <strong id="logisticsScore">0</strong>
+          </div>
+          <div class="score-box">
+            <span>作战分</span>
+            <strong id="combatScore">0</strong>
+          </div>
+          <div class="score-box">
+            <span>限制分</span>
+            <strong id="limitScore">0</strong>
+          </div>
+        </div>
+        <div class="detail">
+          <h3>计分明细</h3>
+          <ul class="detail-list" id="detailList"></ul>
+          <p class="empty" id="emptyDetail">点击计算后显示已计入项目。</p>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <span>版本号：v2.1</span>
+    <span>修改日期：2026.5.19</span>
+    <span>作者：GPT-5.5 &amp; 阿能才不是受</span>
+  </footer>
+
+  <div class="toast" id="toast">已复制</div>
+
+  <script>
+    const scoreState = {
+      total: 0,
+      settlement: 0,
+      logistics: 0,
+      combat: 0,
+      limit: 0,
+      details: []
+    };
+
+    const formatScore = (value) => Number.isInteger(value) ? String(value) : value.toFixed(1);
+
+    const num = (id) => {
+      const value = Number(document.getElementById(id).value);
+      return Number.isFinite(value) && value > 0 ? value : 0;
+    };
+
+    const addDetail = (state, group, label, score) => {
+      if (!score) return;
+      state[group] += score;
+      state.details.push({ group, label, score });
+    };
+
+    const groupName = {
+      settlement: "结算分",
+      logistics: "后勤分",
+      combat: "作战分",
+      limit: "限制分"
+    };
+
+    const groupOrder = {
+      settlement: 0,
+      logistics: 1,
+      combat: 2,
+      limit: 3
+    };
+
+    const sortedDetails = (details) => details
+      .map((item, index) => ({ ...item, index }))
+      .sort((a, b) => {
+        const groupCompare = groupOrder[a.group] - groupOrder[b.group];
+        return groupCompare || a.index - b.index;
+      });
+
+    function selectedRadioScore(name) {
+      const input = document.querySelector(`input[name="${name}"]:checked`);
+      if (!input) return null;
+      const score = Number(input.value);
+      return score > 0 ? { score, label: input.dataset.scoreLabel } : null;
+    }
+
+    function updateSevenState() {
+      const enabled = document.getElementById("seventhBoss").checked;
+      document.querySelectorAll("[data-seven-score]").forEach((input) => {
+        input.disabled = !enabled;
+        if (!enabled) input.checked = false;
+      });
+      document.getElementById("busheScore").textContent = enabled ? "+80" : "+60";
+      document.getElementById("buxiScore").textContent = enabled ? "+80" : "+60";
+    }
+
+    function calculate() {
+      const state = {
+        total: 0,
+        settlement: 0,
+        logistics: 0,
+        combat: 0,
+        limit: 0,
+        details: []
+      };
+
+      const rawSettlement = num("settlementRaw");
+      const multiplier = Number(document.getElementById("difficulty").value);
+      const settlement = rawSettlement * multiplier;
+      addDetail(state, "settlement", `游戏原始结算分 ${formatScore(rawSettlement)} × 难度倍率 ${multiplier}`, settlement);
+
+      const logisticsCounts = [
+        ["collectibleCount", 3, "藏品数量"],
+        ["temp4", 5, "临时招募四星干员"],
+        ["temp5", 10, "临时招募五星干员"],
+        ["temp6", 15, "临时招募六星干员"]
+      ];
+      logisticsCounts.forEach(([id, unit, label]) => {
+        const count = num(id);
+        addDetail(state, "logistics", `${label} × ${count}`, count * unit);
+      });
+
+      document.querySelectorAll('input[type="checkbox"][data-score]').forEach((input) => {
+        if (!input.checked) return;
+        const section = input.closest("section");
+        const sectionTitle = section ? section.querySelector("h2").textContent : "";
+        const group = sectionTitle === "限制分" ? "limit" : sectionTitle === "后勤分" ? "logistics" : "combat";
+        addDetail(state, group, input.dataset.label, Number(input.dataset.score));
+      });
+
+      const seventhBoss = document.getElementById("seventhBoss").checked;
+      const specialCollectibleScore = seventhBoss ? 80 : 60;
+      if (document.getElementById("bushe").checked) {
+        addDetail(state, "logistics", `持有收藏品“不赦”${seventhBoss ? "（七层险路恶敌）" : ""}`, specialCollectibleScore);
+      }
+      if (document.getElementById("buxi").checked) {
+        addDetail(state, "logistics", `持有收藏品“不息”${seventhBoss ? "（七层险路恶敌）" : ""}`, specialCollectibleScore);
+      }
+      if (seventhBoss) {
+        document.querySelectorAll("[data-seven-score]").forEach((input) => {
+          if (input.checked) addDetail(state, "logistics", input.dataset.label, Number(input.dataset.sevenScore));
+        });
+      }
+
+      ["boss_xizi", "boss_wangxi", "boss_mousui", "boss_moshou", "renqi", "fenming", "luyi"].forEach((name) => {
+        const result = selectedRadioScore(name);
+        if (result) addDetail(state, "combat", result.label, result.score);
+      });
+
+      const zhibian = document.getElementById("zhibian");
+      const zhibianScore = Number(zhibian.value);
+      if (zhibianScore > 0) {
+        addDetail(state, "combat", zhibian.selectedOptions[0].dataset.scoreLabel, zhibianScore);
+      }
+
+      const combatCounts = [
+        ["otherLayer3Low", 10, "其他三层紧急"],
+        ["otherLayer3", 25, "其他四层紧急"],
+        ["otherLayer5", 35, "其他五层紧急"],
+        ["otherLayer6", 60, "其他六层紧急"],
+        ["xiaobajie", 10, "小八界出现击杀"],
+        ["beasts", 5, "鸭、狗、熊、鼠出现击杀"]
+      ];
+      combatCounts.forEach(([id, unit, label]) => {
+        const count = num(id);
+        addDetail(state, "combat", `${label} × ${count}`, count * unit);
+      });
+
+      state.total = state.settlement + state.logistics + state.combat + state.limit;
+      Object.assign(scoreState, state);
+      render(state);
+    }
+
+    function render(state) {
+      document.getElementById("heroTotal").textContent = formatScore(state.total);
+      document.getElementById("totalScore").textContent = formatScore(state.total);
+      document.getElementById("settlementScore").textContent = formatScore(state.settlement);
+      document.getElementById("logisticsScore").textContent = formatScore(state.logistics);
+      document.getElementById("combatScore").textContent = formatScore(state.combat);
+      document.getElementById("limitScore").textContent = formatScore(state.limit);
+
+      const list = document.getElementById("detailList");
+      list.innerHTML = "";
+      document.getElementById("emptyDetail").hidden = state.details.length > 0;
+      sortedDetails(state.details).forEach((item) => {
+        const li = document.createElement("li");
+        const span = document.createElement("span");
+        const score = document.createElement("b");
+        span.textContent = `${groupName[item.group]} · ${item.label}`;
+        score.textContent = `+${formatScore(item.score)}`;
+        li.append(span, score);
+        list.append(li);
+      });
+    }
+
+    function resetAll() {
+      document.querySelectorAll("input").forEach((input) => {
+        if (input.type === "checkbox") input.checked = false;
+        if (input.type === "number") input.value = "";
+        if (input.type === "radio") input.checked = input.defaultChecked;
+      });
+      document.querySelectorAll("select").forEach((select) => {
+        select.selectedIndex = 0;
+      });
+      updateSevenState();
+      calculate();
+    }
+
+    async function copyDetails() {
+      calculate();
+      const lines = [
+        `掀树杯#4 算分结果：${formatScore(scoreState.total)}`,
+        `结算分：${formatScore(scoreState.settlement)}`,
+        `后勤分：${formatScore(scoreState.logistics)}`,
+        `作战分：${formatScore(scoreState.combat)}`,
+        `限制分：${formatScore(scoreState.limit)}`
+      ];
+      if (scoreState.details.length) {
+        lines.push("", "计分明细：");
+        sortedDetails(scoreState.details).forEach((item) => {
+          lines.push(`- ${groupName[item.group]} · ${item.label}：+${formatScore(item.score)}`);
+        });
+      }
+      try {
+        await navigator.clipboard.writeText(lines.join("\n"));
+        showToast("已复制明细");
+      } catch {
+        showToast("浏览器未允许复制");
+      }
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    document.getElementById("calcBtn").addEventListener("click", calculate);
+    document.getElementById("copyBtn").addEventListener("click", copyDetails);
+    document.getElementById("resetBtn").addEventListener("click", resetAll);
+    document.getElementById("seventhBoss").addEventListener("change", updateSevenState);
+    document.addEventListener("input", (event) => {
+      if (event.target.matches("input, select")) {
+        if (event.target.id === "seventhBoss") updateSevenState();
+      }
+    });
+
+    updateSevenState();
+    render(scoreState);
+  </script>
+</body>
+</html>
