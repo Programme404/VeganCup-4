@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>掀树杯#4.1 算分器</title>
+  <title>掀树杯#4 算分器</title>
   <style>
     :root {
       color-scheme: light;
@@ -550,22 +550,6 @@
       color: var(--amber);
     }
 
-    .detail-list b.rainbow-score {
-      background:
-        linear-gradient(105deg,
-          #c86161,
-          #d9854e,
-          #d4b84f,
-          #73a96a,
-          #4d9ca6,
-          #5c82c4,
-          #8365b8,
-          #ad6aa6);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
     .empty {
       margin: 0;
       color: var(--muted);
@@ -725,40 +709,6 @@
       margin: 4px 10px;
     }
 
-    .footer-version {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin: 4px 10px;
-    }
-
-    .footer-version span {
-      margin: 0;
-    }
-
-    .github-link {
-      display: inline-grid;
-      place-items: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      color: #5f6a70;
-      transition: color .16s ease, background .16s ease, transform .16s ease;
-      vertical-align: middle;
-    }
-
-    .github-link:hover {
-      background: #eee5da;
-      color: #27343a;
-      transform: translateY(-1px);
-    }
-
-    .github-link svg {
-      width: 18px;
-      height: 18px;
-      fill: currentColor;
-    }
-
     @media (max-width: 980px) {
       .layout {
         grid-template-columns: 1fr;
@@ -806,7 +756,7 @@
     <div class="header-inner">
       <div class="title-block">
         <p class="eyebrow">集成战略 · 岁的界园志异</p>
-        <h1>掀树杯#4.1 算分器</h1>
+        <h1>掀树杯#4 算分器</h1>
         <p class="subtitle">！！！打完不要退出结算界面！！！</p>
       </div>
       <div class="header-score">
@@ -818,7 +768,7 @@
 
   <main>
     <div class="toolbar">
-      <p class="formula">约定：禁止花队和令电表倒转；三层前有一次重开机会；取钱不得超过50源石锭</p>
+      <p class="formula">约定：禁止电表倒转；三层前有一次重开机会；取钱不得超过50</p>
       <div class="actions">
         <button class="btn primary" id="calcBtn" type="button">计算分数</button>
         <button class="btn" id="copyBtn" type="button">复制明细</button>
@@ -878,18 +828,11 @@
                 <span>临时招募六星 · 每个 +15</span>
                 <input id="temp6" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
               </label>
+              <label class="field">
+                <span>取钱超支 · 每超一块 -50</span>
+                <input id="moneyOverrun" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
             </div>
-
-            <div class="group-title">险路恶敌</div>
-            <label class="field">
-              <span>通关层数档位</span>
-              <select id="routeBossTier">
-                <option value="none">未通关五层及以上险路恶敌</option>
-                <option value="five">仅通关五层险路恶敌</option>
-                <option value="fiveSix">同时通关五、六层险路恶敌</option>
-                <option value="fiveSixSeven">同时通关五、六、七层险路恶敌</option>
-              </select>
-            </label>
 
             <div class="group-title">收藏品</div>
             <div class="check-grid">
@@ -899,22 +842,30 @@
               </label>
               <label class="check-pill">
                 <input id="bushe" type="checkbox">
-                <span>不赦 <small id="busheScore">+0</small></span>
+                <span>不赦 <small id="busheScore">+60</small></span>
               </label>
               <label class="check-pill">
                 <input id="buxi" type="checkbox">
-                <span>不息 <small id="buxiScore">+0</small></span>
-              </label>
-              <label class="check-pill">
-                <input id="wufeng" type="checkbox" data-route-label="无封长盒">
-                <span>无封长盒 <small id="wufengScore">+0</small></span>
-              </label>
-              <label class="check-pill">
-                <input id="wangsheng" type="checkbox" data-route-label="忘生珍珑">
-                <span>忘生珍珑 <small id="wangshengScore">+0</small></span>
+                <span>不息 <small id="buxiScore">+60</small></span>
               </label>
             </div>
-            <p class="note">选择险路恶敌档位后，“无封长盒”“忘生珍珑”“不赦”“不息”按对应档位计算。</p>
+
+            <div class="group-title">七层险路恶敌</div>
+            <div class="check-grid">
+              <label class="check-pill">
+                <input id="seventhBoss" type="checkbox">
+                <span>通关七层险路恶敌 <small>启用</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="wufeng" type="checkbox" data-seven-score="50" data-label="七层险路恶敌：无封长盒">
+                <span>无封长盒 <small>+50</small></span>
+              </label>
+              <label class="check-pill">
+                <input id="wangsheng" type="checkbox" data-seven-score="100" data-label="七层险路恶敌：忘生珍珑">
+                <span>忘生珍珑 <small>+100</small></span>
+              </label>
+            </div>
+            <p class="note">七层险路恶敌开启后，“不赦”“不息”按每个 +80 计算。</p>
           </div>
         </section>
 
@@ -969,13 +920,6 @@
                   <option value="400" data-score-label="通关“止变”(其他难度)">其他难度 +400</option>
                 </select>
               </label>
-              <div class="segment-card">
-                <div class="segment-name" aria-hidden="true">&nbsp;</div>
-                <label class="check-pill">
-                  <input type="checkbox" data-score="500" data-label="通关“定本源”">
-                  <span>定本源 <small>+500</small></span>
-                </label>
-              </div>
               <div class="segment-card">
                 <div class="segment-name" aria-hidden="true">&nbsp;</div>
                 <label class="check-pill">
@@ -1126,8 +1070,8 @@
                 <span>150分钟内六层及以上结算 <small>+100</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="150" data-label="180分钟内完成七层及以上的结局结算">
-                <span>180分钟内七层及以上结算 <small>+150</small></span>
+                <input type="checkbox" data-score="150" data-label="200分钟内完成七层及以上的结局结算">
+                <span>200分钟内七层及以上结算 <small>+150</small></span>
               </label>
               <label class="check-pill">
                 <input type="checkbox" data-score="100" data-label="不抓取电弧">
@@ -1138,8 +1082,8 @@
                 <span>不抓取斩业星熊 <small>+100</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="50" data-label="不抓取新约能天使">
-                <span>不抓取新约能天使 <small>+50</small></span>
+                <input type="checkbox" data-score="50" data-label="不抓取酒神">
+                <span>不抓取酒神 <small>+50</small></span>
               </label>
               <label class="check-pill">
                 <input type="checkbox" data-score="50" data-label="不抓取麒麟R夜刀">
@@ -1150,12 +1094,12 @@
                 <span>不抓取凛御银灰 <small>+50</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取酒神">
-                <span>不抓取酒神 <small>+20</small></span>
+                <input type="checkbox" data-score="20" data-label="不抓取新约能天使">
+                <span>不抓取新约能天使 <small>+20</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取霍尔海雅">
-                <span>不抓取霍尔海雅 <small>+20</small></span>
+                <input type="checkbox" data-score="20" data-label="不抓取望">
+                <span>不抓取望 <small>+20</small></span>
               </label>
               <label class="check-pill">
                 <input type="checkbox" data-score="20" data-label="不抓取圣聆初雪">
@@ -1168,13 +1112,6 @@
               <label class="check-pill easter-egg">
                 <input type="checkbox" data-score="7.99" data-label="抓取呼呼呼！">
                 <span>抓取呼呼呼！ <small>+7.99</small></span>
-              </label>
-            </div>
-            <div class="group-title">取钱限制</div>
-            <div class="grid">
-              <label class="field">
-                <span>取钱超支 · 每超1源石锭 -50</span>
-                <input id="moneyOverrun" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
               </label>
             </div>
           </div>
@@ -1225,14 +1162,9 @@
   </main>
 
   <footer class="app-footer">
-    <span>版本号：v4.1</span>
-    <span>修改日期：2026.5.23</span>
+    <span>版本号：v3</span>
+    <span>修改日期：2026.5.21</span>
     <span>作者：GPT-5.5 &amp; 阿能才不是受</span>
-    <a class="github-link" href="https://github.com/Programme404/VeganCup-4" target="_blank" rel="noopener noreferrer" aria-label="GitHub 在线代码仓库">
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        <path d="M8 0C3.58 0 0 3.67 0 8.2c0 3.62 2.29 6.69 5.47 7.77.4.08.55-.18.55-.4v-1.53c-2.23.5-2.7-.98-2.7-.98-.36-.95-.89-1.2-.89-1.2-.73-.51.06-.5.06-.5.8.06 1.23.85 1.23.85.72 1.26 1.88.9 2.34.69.07-.54.28-.9.51-1.11-1.78-.21-3.64-.91-3.64-4.05 0-.9.31-1.63.82-2.2-.08-.21-.36-1.05.08-2.18 0 0 .67-.22 2.2.84A7.45 7.45 0 0 1 8 3.92c.68 0 1.36.09 2 .28 1.53-1.06 2.2-.84 2.2-.84.44 1.13.16 1.97.08 2.18.51.57.82 1.3.82 2.2 0 3.15-1.87 3.84-3.65 4.04.29.26.54.76.54 1.54v2.25c0 .22.15.48.55.4A8.08 8.08 0 0 0 16 8.2C16 3.67 12.42 0 8 0Z"/>
-      </svg>
-    </a>
   </footer>
 
   <div class="toast" id="toast">已复制</div>
@@ -1341,33 +1273,14 @@
       return score > 0 ? { score, label: input.dataset.scoreLabel } : null;
     }
 
-    const routeBossScores = {
-      none: { label: "", wufeng: 0, wangsheng: 0, special: 0 },
-      five: { label: "仅通关五层险路恶敌", wufeng: 20, wangsheng: 50, special: 30 },
-      fiveSix: { label: "同时通关五、六层险路恶敌", wufeng: 30, wangsheng: 100, special: 50 },
-      fiveSixSeven: { label: "同时通关五、六、七层险路恶敌", wufeng: 50, wangsheng: 150, special: 80 }
-    };
-
-    function getRouteBossTier() {
-      return document.getElementById("routeBossTier").value;
-    }
-
-    function updateRouteBossState() {
-      const tier = getRouteBossTier();
-      const scores = routeBossScores[tier];
-      const enabled = tier !== "none";
-      document.querySelectorAll("[data-route-label]").forEach((input) => {
+    function updateSevenState() {
+      const enabled = document.getElementById("seventhBoss").checked;
+      document.querySelectorAll("[data-seven-score]").forEach((input) => {
         input.disabled = !enabled;
         if (!enabled) input.checked = false;
       });
-      [document.getElementById("bushe"), document.getElementById("buxi")].forEach((input) => {
-        input.disabled = !enabled;
-        if (!enabled) input.checked = false;
-      });
-      document.getElementById("wufengScore").textContent = `+${scores.wufeng}`;
-      document.getElementById("wangshengScore").textContent = `+${scores.wangsheng}`;
-      document.getElementById("busheScore").textContent = `+${scores.special}`;
-      document.getElementById("buxiScore").textContent = `+${scores.special}`;
+      document.getElementById("busheScore").textContent = enabled ? "+80" : "+60";
+      document.getElementById("buxiScore").textContent = enabled ? "+80" : "+60";
     }
 
     function calculate() {
@@ -1389,7 +1302,8 @@
         ["collectibleCount", 3, "藏品数量"],
         ["temp4", 5, "临时招募四星干员"],
         ["temp5", 10, "临时招募五星干员"],
-        ["temp6", 15, "临时招募六星干员"]
+        ["temp6", 15, "临时招募六星干员"],
+        ["moneyOverrun", -50, "取钱超支"]
       ];
       logisticsCounts.forEach(([id, unit, label]) => {
         const count = num(id);
@@ -1404,20 +1318,17 @@
         addDetail(state, group, input.dataset.label, Number(input.dataset.score));
       });
 
-      const routeTier = getRouteBossTier();
-      const routeScores = routeBossScores[routeTier];
-      const routeLabel = routeScores.label ? `（${routeScores.label}）` : "";
+      const seventhBoss = document.getElementById("seventhBoss").checked;
+      const specialCollectibleScore = seventhBoss ? 80 : 60;
       if (document.getElementById("bushe").checked) {
-        addDetail(state, "logistics", `持有收藏品“不赦”${routeLabel}`, routeScores.special);
+        addDetail(state, "logistics", `持有收藏品“不赦”${seventhBoss ? "（七层险路恶敌）" : ""}`, specialCollectibleScore);
       }
       if (document.getElementById("buxi").checked) {
-        addDetail(state, "logistics", `持有收藏品“不息”${routeLabel}`, routeScores.special);
+        addDetail(state, "logistics", `持有收藏品“不息”${seventhBoss ? "（七层险路恶敌）" : ""}`, specialCollectibleScore);
       }
-      if (routeTier !== "none") {
-        document.querySelectorAll("[data-route-label]").forEach((input) => {
-          if (!input.checked) return;
-          const score = routeScores[input.id];
-          addDetail(state, "logistics", `${routeScores.label}：${input.dataset.routeLabel}`, score);
+      if (seventhBoss) {
+        document.querySelectorAll("[data-seven-score]").forEach((input) => {
+          if (input.checked) addDetail(state, "logistics", input.dataset.label, Number(input.dataset.sevenScore));
         });
       }
 
@@ -1445,9 +1356,6 @@
         addDetail(state, "combat", `${label} × ${count}`, count * unit);
       });
 
-      const moneyOverrun = num("moneyOverrun");
-      addDetail(state, "limit", `取钱超支 × ${moneyOverrun}`, moneyOverrun * -50);
-
       state.total = state.settlement + state.logistics + state.combat + state.limit;
       Object.assign(scoreState, state);
       render(state);
@@ -1470,9 +1378,6 @@
         const score = document.createElement("b");
         span.textContent = `${groupName[item.group]} · ${item.label}`;
         score.textContent = formatDelta(item.score);
-        if (item.label === "抓取呼呼呼！") {
-          score.classList.add("rainbow-score");
-        }
         li.append(span, score);
         list.append(li);
       });
@@ -1487,14 +1392,14 @@
       document.querySelectorAll("select").forEach((select) => {
         select.selectedIndex = 0;
       });
-      updateRouteBossState();
+      updateSevenState();
       calculate();
     }
 
     async function copyDetails() {
       calculate();
       const lines = [
-        `掀树杯#4.1 算分结果：${formatScore(scoreState.total)}`,
+        `掀树杯#4 算分结果：${formatScore(scoreState.total)}`,
         `结算分：${formatScore(scoreState.settlement)}`,
         `后勤分：${formatScore(scoreState.logistics)}`,
         `作战分：${formatScore(scoreState.combat)}`,
@@ -1527,14 +1432,14 @@
     document.getElementById("resetBtn").addEventListener("click", resetAll);
     document.getElementById("timerToggle").addEventListener("click", toggleTimer);
     document.getElementById("timerReset").addEventListener("click", resetTimer);
-    document.getElementById("routeBossTier").addEventListener("change", updateRouteBossState);
+    document.getElementById("seventhBoss").addEventListener("change", updateSevenState);
     document.addEventListener("input", (event) => {
       if (event.target.matches("input, select")) {
-        if (event.target.id === "routeBossTier") updateRouteBossState();
+        if (event.target.id === "seventhBoss") updateSevenState();
       }
     });
 
-    updateRouteBossState();
+    updateSevenState();
     renderTimer();
     render(scoreState);
   </script>
