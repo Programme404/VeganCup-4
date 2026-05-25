@@ -1130,39 +1130,39 @@
                 <span>180分钟内七层及以上结算 <small>+150</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="100" data-label="不抓取电弧">
+                <input type="checkbox" data-score="100" data-label="不抓取电弧" data-requires-route>
                 <span>不抓取电弧 <small>+100</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="100" data-label="不抓取斩业星熊">
+                <input type="checkbox" data-score="100" data-label="不抓取斩业星熊" data-requires-route>
                 <span>不抓取斩业星熊 <small>+100</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="50" data-label="不抓取新约能天使">
+                <input type="checkbox" data-score="50" data-label="不抓取新约能天使" data-requires-route>
                 <span>不抓取新约能天使 <small>+50</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="50" data-label="不抓取麒麟R夜刀">
+                <input type="checkbox" data-score="50" data-label="不抓取麒麟R夜刀" data-requires-route>
                 <span>不抓取麒麟R夜刀 <small>+50</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="50" data-label="不抓取凛御银灰">
+                <input type="checkbox" data-score="50" data-label="不抓取凛御银灰" data-requires-route>
                 <span>不抓取凛御银灰 <small>+50</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取酒神">
+                <input type="checkbox" data-score="20" data-label="不抓取酒神" data-requires-route>
                 <span>不抓取酒神 <small>+20</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取霍尔海雅">
+                <input type="checkbox" data-score="20" data-label="不抓取霍尔海雅" data-requires-route>
                 <span>不抓取霍尔海雅 <small>+20</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取圣聆初雪">
+                <input type="checkbox" data-score="20" data-label="不抓取圣聆初雪" data-requires-route>
                 <span>不抓取圣聆初雪 <small>+20</small></span>
               </label>
               <label class="check-pill">
-                <input type="checkbox" data-score="20" data-label="不抓取维什戴尔">
+                <input type="checkbox" data-score="20" data-label="不抓取维什戴尔" data-requires-route>
                 <span>不抓取维什戴尔 <small>+20</small></span>
               </label>
               <label class="check-pill easter-egg">
@@ -1170,6 +1170,7 @@
                 <span>抓取呼呼呼！ <small>+7.99</small></span>
               </label>
             </div>
+            <p class="note">不抓取干员加分仅在通关五层险路恶敌之后生效。</p>
             <div class="group-title">取钱限制</div>
             <div class="grid">
               <label class="field">
@@ -1225,8 +1226,7 @@
   </main>
 
   <footer class="app-footer">
-    <span>版本号：v4.1</span>
-    <span>修改日期：2026.5.23</span>
+    <span>版本号：v4.1.0525</span>
     <span>作者：GPT-5.5 &amp; 阿能才不是受</span>
     <a class="github-link" href="https://github.com/Programme404/VeganCup-4" target="_blank" rel="noopener noreferrer" aria-label="GitHub 在线代码仓库">
       <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -1364,6 +1364,10 @@
         input.disabled = !enabled;
         if (!enabled) input.checked = false;
       });
+      document.querySelectorAll("[data-requires-route]").forEach((input) => {
+        input.disabled = !enabled;
+        if (!enabled) input.checked = false;
+      });
       document.getElementById("wufengScore").textContent = `+${scores.wufeng}`;
       document.getElementById("wangshengScore").textContent = `+${scores.wangsheng}`;
       document.getElementById("busheScore").textContent = `+${scores.special}`;
@@ -1397,7 +1401,7 @@
       });
 
       document.querySelectorAll('input[type="checkbox"][data-score]').forEach((input) => {
-        if (!input.checked) return;
+        if (!input.checked || input.disabled) return;
         const section = input.closest("section");
         const sectionTitle = section ? section.querySelector("h2").textContent : "";
         const group = sectionTitle === "限制分" ? "limit" : sectionTitle === "后勤分" ? "logistics" : "combat";
